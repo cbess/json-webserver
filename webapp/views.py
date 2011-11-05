@@ -5,6 +5,7 @@ import os
 from flask import render_template, request, abort, Response
 from server import app
 from ipdb import set_trace
+import json
 
 
 def pprint(value):
@@ -14,6 +15,17 @@ def pprint(value):
     import pprint
     return pprint.pprint(value)
     
+    
+def jprint(value):
+    """Returns a JSON pretty dump"""
+    jobj = value
+    # get an json object, if needed
+    if isinstance(jobj, (str, unicode)):
+        jobj = json.loads(value)
+    return pprint(jobj)
+    
+
+## Web Server routes
 
 @app.route('/')
 def index():
@@ -25,8 +37,11 @@ def index():
     return render_template('index.html', **response)
     
     
-@app.route('/json')
+@app.route('/json', methods=['POST', 'GET'])
 def json_view():
+    """Handles JSON requests
+    @url /json
+    """
     headers = request.headers
     # get form vars
     if request.method == 'POST':
